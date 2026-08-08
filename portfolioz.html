@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Balraj Sallan | Portfolio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Space+Grotesk:wght@300;400;600&display=swap" rel="stylesheet">
+  
+  <style>
+    /* ==========================================
+       RESET & BASE STYLES
+       ========================================== */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: #08080c;
+      color: #ffffff;
+      font-family: 'Space Grotesk', sans-serif;
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
+
+    /* ==========================================
+       BACKGROUND & HERO LAYOUT
+       ========================================== */
+    .hero-container {
+      position: relative;
+      display: flex;
+      width: 100vw;
+      min-height: 100vh;
+      background: #08080c;
+      overflow: hidden;
+    }
+
+    /* Interactive Canvas Overlay for Silver Bones Animation */
+    #silver-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    /* Left Side - Portrait Image Container */
+    .portrait-wrapper {
+      position: relative;
+      width: 45%;
+      min-height: 100vh;
+      background: url('IMG_20260731_180738.png') no-repeat center bottom / cover;
+      z-index: 1;
+      filter: contrast(1.05) brightness(0.95);
+    }
+
+    /* Soft Gradient Blend into dark background on the right */
+    .portrait-wrapper::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 40%;
+      height: 100%;
+      background: linear-gradient(to right, transparent, #08080c);
+    }
+
+    /* Right Side - Content Area */
+    .content-wrapper {
+      position: relative;
+      width: 55%;
+      padding: 6rem 5rem 4rem 4rem; /* Gap on person's right side */
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      z-index: 3;
+    }
+
+    /* ==========================================
+       TYPOGRAPHY & CONTENT
+       ========================================== */
+    .tagline {
+      display: inline-block;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 4px;
+      color: #8a8a93;
+      margin-bottom: 1rem;
+      border-left: 3px solid #e0e0e0;
+      padding-left: 10px;
+    }
+
+    .name {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 4.2rem;
+      font-weight: 900;
+      line-height: 1.05;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      background: linear-gradient(135deg, #ffffff 30%, #a1a1aa 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 0.5rem;
+      text-shadow: 0 0 30px rgba(255, 255, 255, 0.15);
+    }
+
+    .roles {
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: #c4c4cc;
+      margin-bottom: 2rem;
+      letter-spacing: 1px;
+    }
+
+    .roles span {
+      color: #71717a;
+    }
+
+    .bio-box {
+      background: rgba(255, 255, 255, 0.03);
+      border-left: 2px solid rgba(255, 255, 255, 0.3);
+      backdrop-filter: blur(10px);
+      padding: 1.8rem;
+      border-radius: 0 12px 12px 0;
+      max-width: 580px;
+      margin-bottom: 2.5rem;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+    }
+
+    .bio-box p {
+      font-size: 1.05rem;
+      line-height: 1.7;
+      color: #d1d1d6;
+      font-weight: 300;
+    }
+
+    .bio-box strong {
+      color: #ffffff;
+      font-weight: 600;
+    }
+
+    /* Action Buttons */
+    .btn-group {
+      display: flex;
+      gap: 1.2rem;
+    }
+
+    .btn {
+      padding: 0.9rem 2rem;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      text-decoration: none;
+      border-radius: 4px;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      background: #ffffff;
+      color: #000000;
+      border: 1px solid #ffffff;
+    }
+
+    .btn-primary:hover {
+      background: transparent;
+      color: #ffffff;
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.4);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .btn-secondary:hover {
+      border-color: #ffffff;
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    /* ==========================================
+       RESPONSIVE DESIGN
+       ========================================== */
+    @media (max-width: 1024px) {
+      .hero-container {
+        flex-direction: column;
+      }
+
+      .portrait-wrapper {
+        width: 100%;
+        height: 60vh;
+      }
+
+      .portrait-wrapper::after {
+        width: 100%;
+        height: 40%;
+        top: auto;
+        bottom: 0;
+        background: linear-gradient(to bottom, transparent, #08080c);
+      }
+
+      .content-wrapper {
+        width: 100%;
+        padding: 2rem;
+      }
+
+      .name {
+        font-size: 2.8rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <main class="hero-container">
+    <!-- Interactive Silver Head/Bone Mesh Overlay Canvas -->
+    <canvas id="silver-canvas"></canvas>
+
+    <!-- Left Side: Portrait Background -->
+    <div class="portrait-wrapper"></div>
+
+    <!-- Right Side: Content & Intro -->
+    <div class="content-wrapper">
+      <span class="tagline">System.Architect // Creative.Director</span>
+      
+      <h1 class="name">Balraj Sallan</h1>
+      
+      <div class="roles">
+        Software Engineer <span>&bull;</span> Graphic Designer
+      </div>
+
+      <div class="bio-box">
+        <p>
+          Architecting high-performance digital systems at the intersection of <strong>clean code</strong> and <strong>cybernetic visual identity</strong>. I transform complex engineering problems into sleek, intuitive, and visually arresting web experiences.
+        </p>
+      </div>
+
+      <div class="btn-group">
+        <a href="#projects" class="btn btn-primary">View Systems</a>
+        <a href="#contact" class="btn btn-secondary">Initiate Contact</a>
+      </div>
+    </div>
+  </main>
+
+  <!-- ==========================================
+       SILVER BONES METALLIC MESH JAVASCRIPT
+       ========================================== -->
+  <script>
+    const canvas = document.getElementById('silver-canvas');
+    const ctx = canvas.getContext('2d');
+
+    let width, height;
+    let particles = [];
+    let mouse = { x: null, y: null, radius: 180 };
+
+    function resizeCanvas() {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+    }
+
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    // Mouse position tracker
+    window.addEventListener('mousemove', (e) => {
+      mouse.x = e.clientX;
+      mouse.y = e.clientY;
+    });
+
+    window.addEventListener('mouseleave', () => {
+      mouse.x = null;
+      mouse.y = null;
+    });
+
+    // Metallic Particle Node Class
+    class SilverParticle {
+      constructor() {
+        this.x = Math.random() * width;
+        this.y = Math.random() * height;
+        this.vx = (Math.random() - 0.5) * 1.2;
+        this.vy = (Math.random() - 0.5) * 1.2;
+        this.baseRadius = Math.random() * 2 + 1;
+        this.radius = this.baseRadius;
+      }
+
+      update() {
+        this.x += this.vx;
+        this.y += this.vy;
+
+        // Bounce off screen boundaries
+        if (this.x < 0 || this.x > width) this.vx *= -1;
+        if (this.y < 0 || this.y > height) this.vy *= -1;
+
+        // Mouse proximity interaction (creating glowing silver bone connection)
+        if (mouse.x && mouse.y) {
+          let dx = mouse.x - this.x;
+          let dy = mouse.y - this.y;
+          let distance = Math.sqrt(dx * dx + dy * dy);
+
+          if (distance < mouse.radius) {
+            let force = (mouse.radius - distance) / mouse.radius;
+            this.x -= (dx / distance) * force * 2;
+            this.y -= (dy / distance) * force * 2;
+            this.radius = this.baseRadius + force * 2.5;
+          } else {
+            this.radius = this.baseRadius;
+          }
+        }
+      }
+
+      draw() {
+        // Metallic Silver Particle
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fillStyle = '#e2e8f0';
+        ctx.shadowBlur = 8;
+        ctx.shadowColor = '#ffffff';
+        ctx.fill();
+        ctx.shadowBlur = 0; // reset
+      }
+    }
+
+    // Populate Particles
+    const particleCount = Math.floor((width * height) / 12000);
+    for (let i = 0; i < particleCount; i++) {
+      particles.push(new SilverParticle());
+    }
+
+    // Animation Loop
+    function animate() {
+      ctx.clearRect(0, 0, width, height);
+
+      // Connect nodes with metallic silver bone-like lattice structure
+      for (let i = 0; i < particles.length; i++) {
+        particles[i].update();
+        particles[i].draw();
+
+        for (let j = i + 1; j < particles.length; j++) {
+          let dx = particles[i].x - particles[j].x;
+          let dy = particles[i].y - particles[j].y;
+          let distance = Math.sqrt(dx * dx + dy * dy);
+
+          if (distance < 110) {
+            ctx.beginPath();
+            ctx.moveTo(particles[i].x, particles[i].y);
+            ctx.lineTo(particles[j].x, particles[j].y);
+
+            // Dynamic opacity based on distance
+            let alpha = 1 - distance / 110;
+            ctx.strokeStyle = `rgba(226, 232, 240, ${alpha * 0.35})`;
+            ctx.lineWidth = 1;
+            ctx.stroke();
+          }
+        }
+      }
+
+      // Draw subtle interactive cursor ring
+      if (mouse.x && mouse.y) {
+        ctx.beginPath();
+        ctx.arc(mouse.x, mouse.y, 15, 0, Math.PI * 2);
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+      }
+
+      requestAnimationFrame(animate);
+    }
+
+    animate();
+  </script>
+</body>
+</html>

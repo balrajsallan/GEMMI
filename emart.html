@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aura | Modern E-Commerce</title>
+    <style>
+        /* CSS Reset & Variables */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        :root {
+            --bg-color: #ffffff;
+            --surface-color: #f9fafb;
+            --border-color: #e5e7eb;
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --accent-color: #0f172a;
+            --accent-hover: #334155;
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03);
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Navigation Header */
+        header {
+            position: sticky;
+            top: 0;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid var(--border-color);
+            z-index: 100;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            color: var(--text-primary);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1rem;
+            list-style: none;
+        }
+
+        .nav-btn {
+            background: none;
+            border: none;
+            padding: 0.5rem 1rem;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            cursor: pointer;
+            border-radius: var(--radius-sm);
+            transition: all 0.2s ease;
+        }
+
+        .nav-btn:hover, .nav-btn.active {
+            color: var(--text-primary);
+            background-color: var(--surface-color);
+        }
+
+        .action-btns {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        /* Standard Buttons */
+        .btn {
+            padding: 0.6rem 1.2rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: background 0.2s, transform 0.1s;
+        }
+
+        .btn-primary {
+            background-color: var(--accent-color);
+            color: #ffffff;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--accent-hover);
+        }
+
+        .btn-secondary {
+            background-color: var(--surface-color);
+            color: var(--text-primary);
+            border-color: var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background-color: #f3f4f6;
+        }
+
+        /* Page Layout Views */
+        .page-view {
+            display: none;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2.5rem 2rem;
+            width: 100%;
+            flex: 1;
+        }
+
+        .page-view.active {
+            display: block;
+        }
+
+        /* Hero Section (Home Page) */
+        .hero {
+            text-align: center;
+            padding: 4rem 1rem;
+            background-color: var(--surface-color);
+            border-radius: var(--radius-md);
+            margin-bottom: 3rem;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            letter-spacing: -1px;
+        }
+
+        .hero p {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto 2rem auto;
+        }
+
+        /* Catalog Layout */
+        .catalog-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .catalog-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 1.5rem;
+        }
+
+        /* Item Cards */
+        .item-card {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: var(--shadow-sm);
+            transition: transform 0.2s, box-shadow 0.2s;
+            position: relative;
+        }
+
+        .item-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .badge-trending {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: #10b981;
+            color: white;
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 4px 8px;
+            border-radius: 20px;
+            text-transform: uppercase;
+        }
+
+        .item-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            background-color: var(--surface-color);
+        }
+
+        .item-details {
+            padding: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+
+        .item-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .item-price {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--accent-color);
+            margin-bottom: 1rem;
+        }
+
+        .item-details .btn {
+            margin-top: auto;
+            width: 100%;
+        }
+
+        /* Form Controls & Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(4px);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #ffffff;
+            padding: 2rem;
+            border-radius: var(--radius-md);
+            width: 100%;
+            max-width: 450px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 0.4rem;
+            color: var(--text-primary);
+        }
+
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            font-size: 0.95rem;
+            outline: none;
+        }
+
+        .form-group input:focus, .form-group textarea:focus {
+            border-color: var(--accent-color);
+        }
+
+        /* Checkout Page Layout */
+        .checkout-container {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 2.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .checkout-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .order-summary {
+            background: var(--surface-color);
+            padding: 1.5rem;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-color);
+            height: fit-content;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+            font-size: 0.95rem;
+        }
+
+        .summary-total {
+            border-top: 1px solid var(--border-color);
+            padding-top: 0.75rem;
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+
+        /* Footer */
+        footer {
+            border-top: 1px solid var(--border-color);
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-top: auto;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header Navigation -->
+    <header>
+        <div class="nav-container">
+            <div class="logo">AURA.</div>
+            <ul class="nav-links">
+                <li><button class="nav-btn active" onclick="switchPage('homePage')">Home</button></li>
+                <li><button class="nav-btn" onclick="switchPage('catalogPage')">Catalog</button></li>
+                <li><button class="nav-btn" onclick="filterTrendingPage()">Trending</button></li>
+            </ul>
+            <div class="action-btns">
+                <button class="btn btn-secondary" onclick="openModal('uploadModal')">+ Upload Item</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- PAGE 1: HOME PAGE -->
+    <main id="homePage" class="page-view active">
+        <section class="hero">
+            <h1>Minimalist Essentials</h1>
+            <p>Discover sleek, modern items crafted for ultimate functionality and clean living.</p>
+            <button class="btn btn-primary" onclick="switchPage('catalogPage')">Explore Catalog</button>
+        </section>
+
+        <section>
+            <div class="catalog-header">
+                <h2>Featured Items</h2>
+                <button class="btn btn-secondary" onclick="switchPage('catalogPage')">View All</button>
+            </div>
+            <div class="catalog-grid" id="homeFeaturedGrid"></div>
+        </section>
+    </main>
+
+    <!-- PAGE 2: CATALOG & TRENDING PAGE -->
+    <main id="catalogPage" class="page-view">
+        <div class="catalog-header">
+            <h2 id="catalogTitle">All Catalogs</h2>
+            <div class="action-btns">
+                <button class="btn btn-secondary" onclick="renderCatalog('all')">Show All</button>
+                <button class="btn btn-secondary" onclick="renderCatalog('trending')">🔥 Trending Only</button>
+            </div>
+        </div>
+        <div class="catalog-grid" id="catalogGrid"></div>
+    </main>
+
+    <!-- PAGE 3: CHECKOUT & BUYER DETAILS PAGE -->
+    <main id="checkoutPage" class="page-view">
+        <h2 style="margin-bottom: 2rem;">Complete Your Order</h2>
+        <div class="checkout-container">
+            <!-- Buyer Details Form -->
+            <div>
+                <h3 style="margin-bottom: 1rem;">Buyer Details</h3>
+                <form id="checkoutForm" onsubmit="handleOrderSubmit(event)">
+                    <div class="form-group">
+                        <label for="buyerName">Full Name</label>
+                        <input type="text" id="buyerName" required placeholder="John Doe">
+                    </div>
+                    <div class="form-group">
+                        <label for="buyerPhone">Phone Number</label>
+                        <input type="tel" id="buyerPhone" required placeholder="+1 (555) 000-0000">
+                    </div>
+                    <div class="form-group">
+                        <label for="buyerAddress">Shipping Address</label>
+                        <textarea id="buyerAddress" rows="3" required placeholder="123 Main Street, City, Country"></textarea>
+                    </div>
+
+                    <h3 style="margin-top: 2rem; margin-bottom: 1rem;">Payment Method</h3>
+                    <div class="form-group">
+                        <select id="paymentMethod" required>
+                            <option value="card">Credit / Debit Card</option>
+                            <option value="upi">UPI / Instant Pay</option>
+                            <option value="cod">Cash on Delivery</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Place Order Now</button>
+                </form>
+            </div>
+
+            <!-- Order Summary -->
+            <div class="order-summary">
+                <h3 style="margin-bottom: 1rem;">Order Summary</h3>
+                <div id="summaryItems"></div>
+                <div class="summary-row" style="margin-top: 1rem;">
+                    <span>Subtotal</span>
+                    <span id="subtotalPrice">$0.00</span>
+                </div>
+                <div class="summary-row">
+                    <span>Shipping</span>
+                    <span>Free</span>
+                </div>
+                <div class="summary-row summary-total">
+                    <span>Total Amount</span>
+                    <span id="totalPrice">$0.00</span>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- MODAL: UPLOAD ITEM CATALOG -->
+    <div class="modal" id="uploadModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Upload New Item</h3>
+                <button class="btn btn-secondary" style="padding: 0.2rem 0.6rem;" onclick="closeModal('uploadModal')">✕</button>
+            </div>
+            <form onsubmit="handleItemUpload(event)">
+                <div class="form-group">
+                    <label for="itemName">Item Title</label>
+                    <input type="text" id="itemName" required placeholder="Minimalist Watch">
+                </div>
+                <div class="form-group">
+                    <label for="itemPrice">Price ($)</label>
+                    <input type="number" id="itemPrice" step="0.01" required placeholder="120.00">
+                </div>
+                <div class="form-group">
+                    <label for="itemImage">Image URL</label>
+                    <input type="url" id="itemImage" placeholder="https://images.unsplash.com/photo-...">
+                </div>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="itemTrending"> Mark as Trending Item
+                    </label>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Upload to Catalog</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2026 AURA Inc. All rights reserved.</p>
+    </footer>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // Default Catalog Data
+        let catalog = [
+            {
+                id: 1,
+                name: "Wireless ANC Headphones",
+                price: 199.99,
+                trending: true,
+                image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&auto=format&fit=crop"
+            },
+            {
+                id: 2,
+                name: "Minimalist Leather Watch",
+                price: 149.00,
+                trending: true,
+                image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500&auto=format&fit=crop"
+            },
+            {
+                id: 3,
+                name: "Ergonomic Desk Mug",
+                price: 24.50,
+                trending: false,
+                image: "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=500&auto=format&fit=crop"
+            },
+            {
+                id: 4,
+                name: "Smart Fitness Band",
+                price: 89.99,
+                trending: true,
+                image: "https://images.unsplash.com/photo-1575311373937-040b8e1fd5b6?w=500&auto=format&fit=crop"
+            }
+        ];
+
+        let selectedCartItem = null;
+
+        // SPA Navigation Functionality
+        function switchPage(pageId) {
+            document.querySelectorAll('.page-view').forEach(page => page.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+            
+            document.getElementById(pageId).classList.add('active');
+            
+            // Highlight nav button if matching
+            if(pageId === 'homePage') document.querySelectorAll('.nav-btn')[0].classList.add('active');
+            if(pageId === 'catalogPage') document.querySelectorAll('.nav-btn')[1].classList.add('active');
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function filterTrendingPage() {
+            switchPage('catalogPage');
+            renderCatalog('trending');
+            document.querySelectorAll('.nav-btn')[2].classList.add('active');
+        }
+
+        // Render Item Cards
+        function createCardHTML(item) {
+            return `
+                <div class="item-card">
+                    ${item.trending ? '<span class="badge-trending">Trending</span>' : ''}
+                    <img src="${item.image}" alt="${item.name}" onerror="this.src='https://via.placeholder.com/300x200?text=No+Image'">
+                    <div class="item-details">
+                        <div class="item-title">${item.name}</div>
+                        <div class="item-price">$${item.price.toFixed(2)}</div>
+                        <button class="btn btn-primary" onclick="proceedToBuy(${item.id})">Shop Now</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderCatalog(filter = 'all') {
+            const grid = document.getElementById('catalogGrid');
+            const title = document.getElementById('catalogTitle');
+            grid.innerHTML = '';
+
+            let itemsToDisplay = catalog;
+            if (filter === 'trending') {
+                itemsToDisplay = catalog.filter(item => item.trending);
+                title.innerText = "Trending Items";
+            } else {
+                title.innerText = "All Catalogs";
+            }
+
+            itemsToDisplay.forEach(item => {
+                grid.innerHTML += createCardHTML(item);
+            });
+        }
+
+        function renderHomeFeatured() {
+            const grid = document.getElementById('homeFeaturedGrid');
+            grid.innerHTML = '';
+            catalog.slice(0, 3).forEach(item => {
+                grid.innerHTML += createCardHTML(item);
+            });
+        }
+
+        // Upload New Catalog Item Functionality
+        function handleItemUpload(event) {
+            event.preventDefault();
+            const name = document.getElementById('itemName').value;
+            const price = parseFloat(document.getElementById('itemPrice').value);
+            const image = document.getElementById('itemImage').value || 'https://via.placeholder.com/300x200?text=New+Item';
+            const trending = document.getElementById('itemTrending').checked;
+
+            const newItem = {
+                id: Date.now(),
+                name,
+                price,
+                trending,
+                image
+            };
+
+            catalog.unshift(newItem);
+            renderCatalog();
+            renderHomeFeatured();
+            closeModal('uploadModal');
+            event.target.reset();
+            alert('Item successfully added to catalog!');
+        }
+
+        // Buy & Checkout Flow
+        function proceedToBuy(itemId) {
+            selectedCartItem = catalog.find(item => item.id === itemId);
+            if (!selectedCartItem) return;
+
+            // Render summary item on checkout page
+            const summaryDiv = document.getElementById('summaryItems');
+            summaryDiv.innerHTML = `
+                <div class="summary-row">
+                    <span>${selectedCartItem.name}</span>
+                    <span>$${selectedCartItem.price.toFixed(2)}</span>
+                </div>
+            `;
+            document.getElementById('subtotalPrice').innerText = `$${selectedCartItem.price.toFixed(2)}`;
+            document.getElementById('totalPrice').innerText = `$${selectedCartItem.price.toFixed(2)}`;
+
+            switchPage('checkoutPage');
+        }
+
+        function handleOrderSubmit(event) {
+            event.preventDefault();
+            const name = document.getElementById('buyerName').value;
+            const method = document.getElementById('paymentMethod').value;
+
+            alert(`Thank you for your order, ${name}!\nYour payment method (${method.toUpperCase()}) was processed successfully.`);
+            
+            // Reset and go home
+            event.target.reset();
+            switchPage('homePage');
+        }
+
+        // Modal Controls
+        function openModal(id) { document.getElementById(id).classList.add('active'); }
+        function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+        // Initialize App
+        window.onload = () => {
+            renderCatalog();
+            renderHomeFeatured();
+        };
+    </script>
+</body>
+</html>

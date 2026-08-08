@@ -1,0 +1,535 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Balraj Sallan | Portfolio</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Poppins',sans-serif;
+scroll-behavior:smooth;
+}
+
+body{
+background:#000;
+color:#fff;
+overflow-x:hidden;
+}
+
+body::before{
+content:"";
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:
+radial-gradient(circle at top,#444 0%,transparent 60%);
+opacity:.3;
+z-index:-1;
+}
+
+nav{
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:20px 10%;
+background:#111;
+position:fixed;
+width:100%;
+top:0;
+z-index:1000;
+border-bottom:1px solid #333;
+}
+
+.logo{
+font-size:30px;
+font-weight:bold;
+color:white;
+}
+
+nav ul{
+display:flex;
+list-style:none;
+gap:30px;
+}
+
+nav a{
+text-decoration:none;
+color:#ccc;
+transition:.4s;
+}
+
+nav a:hover{
+color:white;
+}
+
+.hero{
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:120px 10%;
+min-height:100vh;
+}
+
+.hero-text{
+max-width:600px;
+}
+
+.hero-text h1{
+font-size:60px;
+}
+
+.hero-text span{
+color:#aaa;
+}
+
+.hero-text p{
+margin-top:20px;
+font-size:18px;
+color:#ccc;
+line-height:1.8;
+}
+
+.btn{
+display:inline-block;
+margin-top:30px;
+padding:15px 35px;
+background:#fff;
+color:#000;
+font-weight:bold;
+text-decoration:none;
+border-radius:30px;
+transition:.4s;
+}
+
+.btn:hover{
+background:#888;
+color:white;
+transform:scale(1.05);
+}
+
+/* Robot */
+
+.robot{
+position:relative;
+width:220px;
+height:420px;
+animation:float 3s ease-in-out infinite;
+}
+
+.head{
+width:130px;
+height:110px;
+background:#ddd;
+border-radius:20px;
+margin:auto;
+position:relative;
+}
+
+.eye{
+position:absolute;
+width:18px;
+height:18px;
+background:#00ffff;
+border-radius:50%;
+top:35px;
+animation:blink 4s infinite;
+}
+
+.eye.left{
+left:35px;
+}
+
+.eye.right{
+right:35px;
+}
+
+.mouth{
+position:absolute;
+width:50px;
+height:6px;
+background:#555;
+bottom:25px;
+left:40px;
+}
+
+.antenna{
+position:absolute;
+width:5px;
+height:35px;
+background:white;
+top:-35px;
+left:63px;
+}
+
+.ball{
+position:absolute;
+width:15px;
+height:15px;
+background:white;
+border-radius:50%;
+top:-45px;
+left:58px;
+animation:glow 2s infinite;
+}
+
+.body{
+width:160px;
+height:180px;
+background:#444;
+margin:auto;
+margin-top:10px;
+border-radius:20px;
+position:relative;
+}
+
+.circle{
+width:25px;
+height:25px;
+background:white;
+border-radius:50%;
+position:absolute;
+left:68px;
+top:40px;
+animation:pulse 2s infinite;
+}
+
+.arm{
+position:absolute;
+width:22px;
+height:120px;
+background:#999;
+top:130px;
+animation:wave 2s infinite;
+transform-origin:top;
+}
+
+.left-arm{
+left:15px;
+}
+
+.right-arm{
+right:15px;
+}
+
+.leg{
+position:absolute;
+width:25px;
+height:120px;
+background:#999;
+bottom:-110px;
+}
+
+.left-leg{
+left:60px;
+}
+
+.right-leg{
+right:60px;
+}
+
+section{
+padding:100px 10%;
+}
+
+.title{
+font-size:40px;
+margin-bottom:40px;
+text-align:center;
+}
+
+.grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+gap:30px;
+}
+
+.card{
+background:#111;
+padding:30px;
+border:1px solid #333;
+border-radius:15px;
+transition:.5s;
+}
+
+.card:hover{
+transform:translateY(-10px);
+border-color:white;
+}
+
+.skill{
+margin:20px 0;
+}
+
+.bar{
+height:10px;
+background:#333;
+border-radius:20px;
+overflow:hidden;
+}
+
+.fill{
+height:100%;
+background:white;
+animation:load 3s;
+}
+
+.contact{
+text-align:center;
+}
+
+footer{
+padding:30px;
+text-align:center;
+color:#888;
+border-top:1px solid #222;
+}
+
+@keyframes float{
+50%{transform:translateY(-20px);}
+}
+
+@keyframes wave{
+50%{transform:rotate(25deg);}
+}
+
+@keyframes blink{
+48%,52%{height:18px;}
+50%{height:3px;}
+}
+
+@keyframes glow{
+50%{
+box-shadow:0 0 20px white;
+}
+}
+
+@keyframes pulse{
+50%{
+transform:scale(1.4);
+}
+}
+
+@keyframes load{
+from{width:0;}
+}
+</style>
+
+</head>
+
+<body>
+
+<nav>
+
+<div class="logo">Dynamics</div>
+
+<ul>
+<li><a href="#about">About</a></li>
+<li><a href="#skills">Skills</a></li>
+<li><a href="#projects">Projects</a></li>
+<li><a href="#contact">Contact</a></li>
+</ul>
+
+</nav>
+
+<section class="hero">
+
+<div class="hero-text">
+
+<h1>Hello I'm <span>Balraj Sallan</span></h1>
+
+<p>
+
+Graphic Designer • Software Engineer
+
+Creating modern UI designs, branding, websites,
+creative graphics and software solutions with clean,
+professional design.
+
+</p>
+
+<a href="#projects" class="btn">View Portfolio</a>
+
+</div>
+
+<div class="robot">
+
+<div class="head">
+<div class="antenna"></div>
+<div class="ball"></div>
+
+<div class="eye left"></div>
+<div class="eye right"></div>
+
+<div class="mouth"></div>
+</div>
+
+<div class="body">
+<div class="circle"></div>
+</div>
+
+<div class="arm left-arm"></div>
+<div class="arm right-arm"></div>
+
+<div class="leg left-leg"></div>
+<div class="leg right-leg"></div>
+
+</div>
+
+</section>
+
+<section id="about">
+
+<h2 class="title">About Me</h2>
+
+<div class="card">
+
+<h3>Balraj Sallan</h3>
+
+<p>
+
+I am a passionate Graphic Designer and Software Engineer.
+I specialize in UI Design, Branding, Web Design,
+HTML, CSS, JavaScript, App Development and Creative
+Digital Content.
+
+My goal is to build visually attractive and high-performance
+digital experiences.
+
+</p>
+
+</div>
+
+</section>
+
+<section id="skills">
+
+<h2 class="title">Skills</h2>
+
+<div class="grid">
+
+<div class="card">
+
+<div class="skill">
+HTML
+<div class="bar">
+<div class="fill" style="width:95%;"></div>
+</div>
+</div>
+
+<div class="skill">
+CSS
+<div class="bar">
+<div class="fill" style="width:90%;"></div>
+</div>
+</div>
+
+<div class="skill">
+JavaScript
+<div class="bar">
+<div class="fill" style="width:80%;"></div>
+</div>
+</div>
+
+<div class="skill">
+Graphic Design
+<div class="bar">
+<div class="fill" style="width:98%;"></div>
+</div>
+</div>
+
+<div class="skill">
+UI/UX Design
+<div class="bar">
+<div class="fill" style="width:90%;"></div>
+</div>
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+<section id="projects">
+
+<h2 class="title">Projects</h2>
+
+<div class="grid">
+
+<div class="card">
+<h3>Brand Identity</h3>
+<p>Modern branding and logo design.</p>
+</div>
+
+<div class="card">
+<h3>Website Design</h3>
+<p>Responsive business websites.</p>
+</div>
+
+<div class="card">
+<h3>Mobile Apps</h3>
+<p>Android and web applications.</p>
+</div>
+
+<div class="card">
+<h3>Creative Posters</h3>
+<p>Professional social media graphics.</p>
+</div>
+
+<div class="card">
+<h3>Software Development</h3>
+<p>Desktop and web software solutions.</p>
+</div>
+
+<div class="card">
+<h3>UI Design</h3>
+<p>Modern user interfaces and dashboards.</p>
+</div>
+
+</div>
+
+</section>
+
+<section id="contact">
+
+<h2 class="title">Contact</h2>
+
+<div class="card contact">
+
+<h3>Balraj Sallan</h3>
+
+<p>Graphic Designer</p>
+
+<p>Software Engineer</p>
+
+<p>Email: balieesalln@email.com</p>
+
+<p>Phone: +91 6284024146 </p>
+
+<br>
+
+<a href="#" class="btn">Download Resume</a>
+
+</div>
+
+</section>
+
+<footer>
+
+© 2026 Balraj Sallan | Designed with HTML & CSS
+
+</footer>
+
+</body>
+</html>
+
+Give me more detailed good looking robot code

@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Neural Network Engine</title>
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+html,
+body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #020408;
+    font-family: Arial, Helvetica, sans-serif;
+}
+body {
+    color: white;
+}
+/* Canvas */
+#neuralCanvas {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+    cursor: grab;
+}
+#neuralCanvas:active {
+    cursor: grabbing;
+}
+/* UI */
+.ui {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+}
+/* Top title */
+.title {
+    position: absolute;
+    top: 25px;
+    left: 30px;
+    pointer-events: none;
+}
+.title h1 {
+    font-size: 22px;
+    letter-spacing: 4px;
+    font-weight: 700;
+}
+.title p {
+    margin-top: 7px;
+    color: #6f8190;
+    font-size: 11px;
+    letter-spacing: 2px;
+}
+/* Control panel */
+.panel {
+    position: absolute;
+    top: 25px;
+    right: 25px;
+    width: 250px;
+    padding: 18px;
+    border: 1px solid rgba(0, 255, 200, .18);
+    background: rgba(3, 8, 12, .82);
+    backdrop-filter: blur(12px);
+    border-radius: 12px;
+    pointer-events: auto;
+    box-shadow:
+        0 0 40px rgba(0, 255, 200, .04),
+        inset 0 0 20px rgba(0, 255, 200, .02);
+}
+.panel h2 {
+    font-size: 12px;
+    letter-spacing: 3px;
+    color: #00ffd0;
+    margin-bottom: 15px;
+}
+.control {
+    margin-bottom: 15px;
+}
+.control label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: #82919b;
+    margin-bottom: 7px;
+}
+.control span {
+    color: #00ffd0;
+}
+input[type="range"] {
+    width: 100%;
+    accent-color: #00ffd0;
+}
+button {
+    width: 100%;
+    padding: 10px;
+    border-radius: 7px;
+    border: 1px solid rgba(0,255,208,.3);
+    background: rgba(0,255,208,.06);
+    color: #00ffd0;
+    cursor: pointer;
+    letter-spacing: 1px;
+    font-size: 11px;
+    margin-top: 5px;
+}
+button:hover {
+    background: rgba(0,255,208,.15);
+}
+/* Stats */
+.stats {
+    position: absolute;
+    left: 30px;
+    bottom: 25px;
+    display: flex;
+    gap: 25px;
+}
+.stat {
+    min-width: 100px;
+}
+.stat small {
+    display: block;
+    color: #65737c;
+    font-size: 9px;
+    letter-spacing: 2px;
+    margin-bottom: 5px;
+}
+.stat strong {
+    color: #00ffd0;
+    font-size: 17px;
+    font-weight: 500;
+}
+/* Help */
+.help {
+    position: absolute;
+    bottom: 25px;
+    right: 25px;
+    color: #53616b;
+    font-size: 10px;
+    text-align: right;
+    line-height: 1.8;
+}
+/* Scanline */
+.scanline {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background:
+        repeating-linear-gradient(
+            to bottom,
+            transparent 0px,
+            transparent 3px,
+            rgba(255,255,255,.008) 4px
+        );
+}
+</style>
+</head>
+<body>
+<canvas id="neuralCanvas"></canvas>
+<div class="ui">
+    <div class="title">
+        <h1>NEURAL ENGINE</h1>
+        <p>ARTIFICIAL INTELLIGENCE CORE</p>
+    </div>
+    <div class="panel">
+        <h2>ENGINE CONTROL</h2>
+        <div class="control">
+            <label>
+                Neurons
+                <span id="neuronValue">500</span>
+            </label>
+            <input
+                id="neuronSlider"
+                type="range"
+                min="100"
+                max="1200"
+                value="500"
+                step="50"
+            >
+        </div>
+        <div class="control">
+            <label>
+                Connections
+                <span id="connectionValue">8</span>
+            </label>
+            <input
+                id="connectionSlider"
+                type="range"
+                min="2"
+                max="15"
+                value="8"
+                step="1"
+            >
+        </div>
+        <div class="control">
+            <label>
+                Signal Speed
+                <span id="speedValue">1.0</span>
+            </label>
+            <input
+                id="speedSlider"
+                type="range"
+                min="0.1"
+                max="4"
+                value="1"
+                step="0.1"
+            >
+        </div>
+        <button id="regenerate">
+            REGENERATE NETWORK
+        </button>
+        <button id="pause">
+            PAUSE ENGINE
+        </button>
+    </div>
+    <div class="stats">
+        <div class="stat">
+            <small>NEURONS</small>
+            <strong id="statNeurons">500</strong>
+        </div>
+        <div class="stat">
+            <small>CABLES</small>
+            <strong id="statConnections">0</strong>
+        </div>
+        <div class="stat">
+            <small>FPS</small>
+            <strong id="fps">60</strong>
+        </div>
+        <div class="stat">
+            <small>STATUS</small>
+            <strong id="status">ONLINE</strong>
+        </div>
+    </div>
+    <div class="help">
+        DRAG = MOVE<br>
+        WHEEL = ZOOM<br>
+        CLICK = ACTIVATE NEURON
+    </div>
+</div>
+<div class="scanline"></div>
+<script>
+/* =========================================================
+   NEURAL NETWORK ENGINE
+   ========================================================= */
+const canvas = document.getElementById("neuralCanvas");
+const ctx = canvas.getContext("2d");
+let width;
+let height;
+let dpr;
+let neurons = [];
+let connections = [];
+let pulses = [];
+let neuronCount = 500;
+let connectionsPerNeuron = 8;
+let signalSpeed = 1;
+let paused = false;
+let zoom = 1;
+let offsetX = 0;
+let offsetY = 0;
+let mouseX = 0;
+let mouseY = 0;
+let dragging = false;
+let lastMouseX = 0;
+let lastMouseY = 0;
+/* =========================================================
+   RESIZE
+   ========================================================= */
+function resizeCanvas() {
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    width = window.innerWidth;
+    height = window.innerHeight;
+    canvas.width = width * dpr;
+    canvas.height = height * dpr;
+    canvas.style.width = width + "px";
+    canvas.style.height = height + "px";
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+window.addEventListener("resize", resizeCanvas);
+resizeCanvas();
+/* =========================================================
+   RANDOM HELPERS
+   ========================================================= */
+function random(min, max) {
+    return Math.random() * (max - min) + min;
+}
+function distance(a, b) {
+    const dx = a.x - b.x;
+    const dy = a.y - b.y;
+    return Math.sqrt(dx * dx + dy * dy);
+}
+/* =========================================================
+   CREATE NEURONS
+   ========================================================= */
+function createNeurons() {
+    neurons = [];
+    const area = Math.sqrt(neuronCount) * 65;
+    for (let i = 0; i < neuronCount; i++) {
+        neurons.push({
+            id: i,
+            x: random(-area, area),
+            y: random(-area, area),
+            z: random(.3, 1.2),
+            radius: random(.7, 2.5),
+            energy: random(0, 1),
+            pulse: random(0, Math.PI * 2),
+            vx: random(-.03, .03),
+            vy: random(-.03, .03)
+        });
+    }
+}
+/* =========================================================
+   CREATE THOUSANDS OF CABLES
+   ========================================================= */
+function createConnections() {
+    connections = [];
+    const maxDistance = 180;
+    for (let i = 0; i < neurons.length; i++) {
+        const source = neurons[i];
+        let nearby = [];
+        for (let j = 0; j < neurons.length; j++) {
+            if (i === j) continue;
+            const target = neurons[j];
+            const dx = source.x - target.x;
+            const dy = source.y - target.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist < maxDistance) {
+                nearby.push({
+                    neuron: target,
+                    distance: dist
+                });
+            }
+        }
+        nearby.sort((a, b) => a.distance - b.distance);
+        const amount = Math.min(
+            connectionsPerNeuron,
+            nearby.length
+        );
+        for (let n = 0; n < amount; n++) {
+            const target = nearby[n].neuron;
+            /* Avoid duplicate cables */
+            if (source.id < target.id) {
+                connections.push({
+                    a: source,
+                    b: target,
+                    energy: random(0, 1),
+                    speed: random(.2, 1)
+                });
+            }
+        }
+    }
+    document.getElementById("statConnections")
+        .textContent = connections.length.toLocaleString();
+}
+/* =========================================================
+   CREATE SIGNAL PULSES
+   ========================================================= */
+function createPulse() {
+    if (connections.length === 0) return;
+    const connection =
+        connections[
+            Math.floor(Math.random() * connections.length)
+        ];
+    pulses.push({
+        connection: connection,
+        progress: 0,
+        speed: random(.004, .012) * signalSpeed,
+        reverse: Math.random() > .5
+    });
+}
+/* =========================================================
+   WORLD TO SCREEN
+   ========================================================= */
+function worldToScreen(x, y) {
+    return {
+        x: width / 2 + (x + offsetX) * zoom,
+        y: height / 2 + (y + offsetY) * zoom
+    };
+}
+/* =========================================================
+   DRAW BACKGROUND
+   ========================================================= */
+function drawBackground() {
+    const gradient =
+        ctx.createRadialGradient(
+            width / 2,
+            height / 2,
+            0,
+            width / 2,
+            height / 2,
+            Math.max(width, height)
+        );
+    gradient.addColorStop(0, "#071316");
+    gradient.addColorStop(.5, "#02080c");
+    gradient.addColorStop(1, "#010203");
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, width, height);
+    /* Grid */
+    ctx.save();
+    ctx.globalAlpha = .04;
+    const gridSize = 80 * zoom;
+    ctx.strokeStyle = "#00ffd0";
+    ctx.lineWidth = 1;
+    const startX =
+        (offsetX * zoom) % gridSize;
+    const startY =
+        (offsetY * zoom) % gridSize;
+    for (
+        let x = startX;
+        x < width;
+        x += gridSize
+    ) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, height);
+        ctx.stroke();
+    }
+    for (
+        let y = startY;
+        y < height;
+        y += gridSize
+    ) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(width, y);
+        ctx.stroke();
+    }
+    ctx.restore();
+}
+/* =========================================================
+   DRAW CONNECTIONS
+   ========================================================= */
+function drawConnections() {
+    ctx.lineWidth = .45;
+    for (const connection of connections) {
+        const a =
+            worldToScreen(
+                connection.a.x,
+                connection.a.y
+            );
+        const b =
+            worldToScreen(
+                connection.b.x,
+                connection.b.y
+            );
+        const energy =
+            .12 +
+            connection.energy * .18;
+        ctx.strokeStyle =
+            `rgba(0,255,210,${energy})`;
+        ctx.beginPath();
+        ctx.moveTo(a.x, a.y);
+        ctx.lineTo(b.x, b.y);
+        ctx.stroke();
+    }
+}
+/* =========================================================
+   DRAW NEURONS
+   ========================================================= */
+function drawNeurons(time) {
+    for (const neuron of neurons) {
+        const position =
+            worldToScreen(
+                neuron.x,
+                neuron.y
+            );
+        const breathing =
+            Math.sin(
+                time * .002 +
+                neuron.pulse
+            ) * .5 + .5;
+        const radius =
+            (neuron.radius +
+            breathing * .6) *
+            neuron.z *
+            zoom;
+        if (
+            position.x < -20 ||
+            position.x > width + 20 ||
+            position.y < -20 ||
+            position.y > height + 20
+        ) {
+            continue;
+        }
+        /* Glow */
+        const glow =
+            ctx.createRadialGradient(
+                position.x,
+                position.y,
+                0,
+                position.x,
+                position.y,
+                radius * 7
+            );
+        glow.addColorStop(
+            0,
+            "rgba(0,255,210,.35)"
+        );
+        glow.addColorStop(
+            1,
+            "rgba(0,255,210,0)"
+        );
+        ctx.fillStyle = glow;
+        ctx.beginPath();
+        ctx.arc(
+            position.x,
+            position.y,
+            radius * 7,
+            0,
+            Math.PI * 2
+        );
+        ctx.fill();
+        /* Core */
+        ctx.fillStyle = "#00ffd0";
+        ctx.beginPath();
+        ctx.arc(
+            position.x,
+            position.y,
+            Math.max(radius, .7),
+            0,
+            Math.PI * 2
+        );
+        ctx.fill();
+    }
+}
+/* =========================================================
+   DRAW SIGNAL PULSES
+   ========================================================= */
+function drawPulses() {
+    for (const pulse of pulses) {
+        const connection = pulse.connection;
+        const a =
+            worldToScreen(
+                connection.a.x,
+                connection.a.y
+            );
+        const b =
+            worldToScreen(
+                connection.b.x,
+                connection.b.y
+            );
+        let progress =
+            pulse.reverse
+                ? 1 - pulse.progress
+                : pulse.progress;
+        const x =
+            a.x +
+            (b.x - a.x) *
+            progress;
+        const y =
+            a.y +
+            (b.y - a.y) *
+            progress;
+        /* Outer glow */
+        const glow =
+            ctx.createRadialGradient(
+                x,
+                y,
+                0,
+                x,
+                y,
+                12
+            );
+        glow.addColorStop(
+            0,
+            "rgba(255,255,255,.9)"
+        );
+        glow.addColorStop(
+            .25,
+            "rgba(0,255,210,.7)"
+        );
+        glow.addColorStop(
+            1,
+            "rgba(0,255,210,0)"
+        );
+        ctx.fillStyle = glow;
+        ctx.beginPath();
+        ctx.arc(x, y, 12, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = "#ffffff";
+        ctx.beginPath();
+        ctx.arc(x, y, 2, 0, Math.PI * 2);
+        ctx.fill();
+    }
+}
+/* =========================================================
+   UPDATE
+   ========================================================= */
+function update() {
+    if (paused) return;
+    /* Slight neuron movement */
+    for (const neuron of neurons) {
+        neuron.x += neuron.vx;
+        neuron.y += neuron.vy;
+    }
+    /* Generate signals */
+    if (Math.random() < .18) {
+        createPulse();
+    }
+    /* Update signals */
+    for (let i = pulses.length - 1; i >= 0; i--) {
+        const pulse = pulses[i];
+        pulse.progress += pulse.speed;
+        if (pulse.progress >= 1) {
+            pulse.connection.b.energy = 1;
+            pulses.splice(i, 1);
+        }
+    }
+    /* Slowly decay cable energy */
+    for (const connection of connections) {
+        connection.energy *= .985;
+    }
+}
+/* =========================================================
+   MAIN LOOP
+   ========================================================= */
+let lastFrame = performance.now();
+let fpsCounter = 0;
+let fpsTimer = performance.now();
+function animate(time) {
+    const delta =
+        Math.min(
+            time - lastFrame,
+            50
+        );
+    lastFrame = time;
+    update();
+    drawBackground();
+    ctx.save();
+    drawConnections();
+    drawPulses();
+    drawNeurons(time);
+    ctx.restore();
+    /* FPS */
+    fpsCounter++;
+    if (time - fpsTimer > 1000) {
+        document.getElementById("fps")
+            .textContent = fpsCounter;
+        fpsCounter = 0;
+        fpsTimer = time;
+    }
+    requestAnimationFrame(animate);
+}
+requestAnimationFrame(animate);
+/* =========================================================
+   GENERATE NETWORK
+   ========================================================= */
+function generateNetwork() {
+    document.getElementById("status")
+        .textContent = "BUILDING";
+    createNeurons();
+    /*
+      Building every possible pair would be O(n²).
+      The simple implementation below is acceptable
+      for moderate neuron counts, but thousands of
+      neurons require spatial optimization.
+    */
+    createConnections();
+    pulses = [];
+    setTimeout(() => {
+        document.getElementById("status")
+            .textContent = "ONLINE";
+    }, 500);
+}
+/* =========================================================
+   CONTROLS
+   ========================================================= */
+const neuronSlider =
+    document.getElementById("neuronSlider");
+const connectionSlider =
+    document.getElementById("connectionSlider");
+const speedSlider =
+    document.getElementById("speedSlider");
+neuronSlider.addEventListener("input", () => {
+    neuronCount =
+        Number(neuronSlider.value);
+    document.getElementById("neuronValue")
+        .textContent = neuronCount;
+    document.getElementById("statNeurons")
+        .textContent = neuronCount;
+});
+connectionSlider.addEventListener("input", () => {
+    connectionsPerNeuron =
+        Number(connectionSlider.value);
+    document.getElementById("connectionValue")
+        .textContent =
+        connectionsPerNeuron;
+});
+speedSlider.addEventListener("input", () => {
+    signalSpeed =
+        Number(speedSlider.value);
+    document.getElementById("speedValue")
+        .textContent =
+        signalSpeed.toFixed(1);
+});
+document
+    .getElementById("regenerate")
+    .addEventListener("click", () => {
+        generateNetwork();
+    });
+document
+    .getElementById("pause")
+    .addEventListener("click", () => {
+        paused = !paused;
+        document.getElementById("pause")
+            .textContent =
+            paused
+                ? "RESUME ENGINE"
+                : "PAUSE ENGINE";
+        document.getElementById("status")
+            .textContent =
+            paused
+                ? "PAUSED"
+                : "ONLINE";
+    });
+/* =========================================================
+   MOUSE / TOUCH PAN
+   ========================================================= */
+canvas.addEventListener("mousedown", e => {
+    dragging = true;
+    lastMouseX = e.clientX;
+    lastMouseY = e.clientY;
+});
+window.addEventListener("mouseup", () => {
+    dragging = false;
+});
+window.addEventListener("mousemove", e => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+    if (!dragging) return;
+    const dx =
+        e.clientX - lastMouseX;
+    const dy =
+        e.clientY - lastMouseY;
+    offsetX += dx / zoom;
+    offsetY += dy / zoom;
+    lastMouseX = e.clientX;
+    lastMouseY = e.clientY;
+});
+/* =========================================================
+   ZOOM
+   ========================================================= */
+canvas.addEventListener(
+    "wheel",
+    e => {
+        e.preventDefault();
+        const oldZoom = zoom;
+        if (e.deltaY < 0) {
+            zoom *= 1.1;
+        } else {
+            zoom /= 1.1;
+        }
+        zoom =
+            Math.max(
+                .15,
+                Math.min(zoom, 5)
+            );
+        /* Keep zoom centered around mouse */
+        const worldX =
+            (e.clientX - width / 2) /
+            oldZoom -
+            offsetX;
+        const worldY =
+            (e.clientY - height / 2) /
+            oldZoom -
+            offsetY;
+        offsetX =
+            (e.clientX - width / 2) /
+            zoom -
+            worldX;
+        offsetY =
+            (e.clientY - height / 2) /
+            zoom -
+            worldY;
+    },
+    { passive: false }
+);
+/* =========================================================
+   CLICK TO ACTIVATE NEURON
+   ========================================================= */
+canvas.addEventListener("click", e => {
+    if (dragging) return;
+    const worldX =
+        (e.clientX - width / 2) /
+        zoom -
+        offsetX;
+    const worldY =
+        (e.clientY - height / 2) /
+        zoom -
+        offsetY;
+    let closest = null;
+    let closestDistance = 25 / zoom;
+    for (const neuron of neurons) {
+        const dx =
+            neuron.x - worldX;
+        const dy =
+            neuron.y - worldY;
+        const dist =
+            Math.sqrt(
+                dx * dx +
+                dy * dy
+            );
+        if (dist < closestDistance) {
+            closest = neuron;
+            closestDistance = dist;
+        }
+    }
+    if (closest) {
+        closest.energy = 1;
+        /* Fire signals from this neuron */
+        for (const connection of connections) {
+            if (
+                connection.a === closest ||
+                connection.b === closest
+            ) {
+                connection.energy = 1;
+                pulses.push({
+                    connection: connection,
+                    progress: 0,
+                    speed:
+                        random(.008, .018) *
+                        signalSpeed,
+                    reverse:
+                        connection.b === closest
+                });
+            }
+        }
+    }
+});
+/* =========================================================
+   TOUCH SUPPORT
+   ========================================================= */
+canvas.addEventListener(
+    "touchstart",
+    e => {
+        if (e.touches.length !== 1) return;
+        const touch = e.touches[0];
+        dragging = true;
+        lastMouseX = touch.clientX;
+        lastMouseY = touch.clientY;
+    },
+    { passive: true }
+);
+canvas.addEventListener(
+    "touchmove",
+    e => {
+        if (!dragging || e.touches.length !== 1)
+            return;
+        const touch = e.touches[0];
+        const dx =
+            touch.clientX -
+            lastMouseX;
+        const dy =
+            touch.clientY -
+            lastMouseY;
+        offsetX += dx / zoom;
+        offsetY += dy / zoom;
+        lastMouseX = touch.clientX;
+        lastMouseY = touch.clientY;
+    },
+    { passive: true }
+);
+canvas.addEventListener(
+    "touchend",
+    () => {
+        dragging = false;
+    }
+);
+/* =========================================================
+   START
+   ========================================================= */
+generateNetwork();
+</script>
+</body>
+</html>

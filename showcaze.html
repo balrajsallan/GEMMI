@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Showcase</title>
+  <style>
+    /* Global Reset & Theme */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: #000000;
+      color: #e0e0e0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1.6;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    /* Header & Welcome Styling */
+    header {
+      text-align: center;
+      margin-bottom: 40px;
+      border-bottom: 1px solid #333;
+      padding-bottom: 20px;
+    }
+
+    h1.brand-title {
+      font-size: 3rem;
+      color: #ffffff;
+      letter-spacing: 2px;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+    }
+
+    .welcome-text {
+      color: #a0a0a0;
+      font-size: 1.1rem;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    /* Control Panel Controls */
+    .controls-panel {
+      background-color: #121212;
+      border: 1px solid #2a2a2a;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 30px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .btn {
+      background-color: #262626;
+      color: #ffffff;
+      border: 1px solid #404040;
+      padding: 10px 18px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 0.95rem;
+      transition: all 0.2s ease;
+    }
+
+    .btn:hover {
+      background-color: #333333;
+      border-color: #666666;
+    }
+
+    .btn-primary {
+      background-color: #ffffff;
+      color: #000000;
+      font-weight: bold;
+    }
+
+    .btn-primary:hover {
+      background-color: #d9d9d9;
+    }
+
+    /* Hidden File Input */
+    #imageInput {
+      display: none;
+    }
+
+    /* Dynamic Content Showcase Section */
+    #showcase-feed {
+      display: flex;
+      flex-direction: column;
+      gap: 25px;
+    }
+
+    /* Heading Text Styles */
+    .heading-large {
+      font-size: 2.2rem;
+      color: #ffffff;
+      border-left: 4px solid #ffffff;
+      padding-left: 12px;
+      margin-top: 10px;
+    }
+
+    .heading-medium {
+      font-size: 1.6rem;
+      color: #d0d0d0;
+      border-left: 3px solid #888888;
+      padding-left: 10px;
+      margin-top: 10px;
+    }
+
+    .heading-small {
+      font-size: 1.2rem;
+      color: #a0a0a0;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-top: 10px;
+    }
+
+    .custom-paragraph {
+      color: #cccccc;
+      font-size: 1rem;
+      margin-bottom: 10px;
+    }
+
+    /* Image Display Styling */
+    .image-card {
+      background-color: #111111;
+      border: 1px solid #222222;
+      border-radius: 8px;
+      padding: 15px;
+      text-align: center;
+    }
+
+    .image-card img {
+      max-width: 100%;
+      max-height: 500px;
+      border-radius: 5px;
+      display: block;
+      margin: 0 auto;
+      object-fit: contain;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- Header Section -->
+    <header>
+      <h1 class="brand-title">Showcase</h1>
+      <p class="welcome-text">
+        Welcome to Showcase! This is your personal creative vault designed to highlight your favorite moments, visual portfolio, and personal stories. Upload your high-resolution images, customize headers, and build a clean, minimalist display that lets your content speak for itself.
+      </p>
+    </header>
+
+    <!-- Controls / Action Buttons -->
+    <div class="controls-panel">
+      <!-- Hidden image input triggered by label button -->
+      <label for="imageInput" class="btn btn-primary">📷 Upload Image</label>
+      <input type="file" id="imageInput" accept="image/*">
+
+      <button class="btn" onclick="addHeading('large')">+ Large Heading</button>
+      <button class="btn" onclick="addHeading('medium')">+ Medium Heading</button>
+      <button class="btn" onclick="addHeading('small')">+ Small Heading</button>
+      <button class="btn" onclick="addParagraph()">+ Text Paragraph</button>
+    </div>
+
+    <!-- Main Output Gallery -->
+    <div id="showcase-feed"></div>
+  </div>
+
+  <script>
+    const feed = document.getElementById('showcase-feed');
+    const imageInput = document.getElementById('imageInput');
+
+    // Handle Image Upload
+    imageInput.addEventListener('change', function(event) {
+      const file = event.target.files[0];
+      
+      if (file) {
+        const reader = new FileReader();
+
+        reader.onload = function(e) {
+          const card = document.createElement('div');
+          card.className = 'image-card';
+
+          const img = document.createElement('img');
+          img.src = e.target.result;
+          img.alt = "Uploaded Personal Image";
+
+          card.appendChild(img);
+          feed.appendChild(card);
+        };
+
+        reader.readAsDataURL(file);
+        
+        // Reset input value to allow re-uploading the same file if needed
+        imageInput.value = '';
+      }
+    });
+
+    // Add Dynamic Headings
+    function addHeading(type) {
+      const text = prompt("Enter text for your heading:");
+      if (!text || text.trim() === "") return;
+
+      const heading = document.createElement(type === 'large' ? 'h2' : type === 'medium' ? 'h3' : 'h4');
+      heading.textContent = text;
+
+      if (type === 'large') {
+        heading.className = 'heading-large';
+      } else if (type === 'medium') {
+        heading.className = 'heading-medium';
+      } else if (type === 'small') {
+        heading.className = 'heading-small';
+      }
+
+      feed.appendChild(heading);
+    }
+
+    // Add Dynamic Text Paragraphs
+    function addParagraph() {
+      const text = prompt("Enter your text paragraph:");
+      if (!text || text.trim() === "") return;
+
+      const p = document.createElement('p');
+      p.className = 'custom-paragraph';
+      p.textContent = text;
+
+      feed.appendChild(p);
+    }
+  </script>
+
+</body>
+</html>
