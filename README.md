@@ -1,2 +1,2 @@
-# GEMMI
-HELLO IM GEMMI
+# Dimes Projects
+
