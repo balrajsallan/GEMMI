@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> Habit Taken - Habit Tracker</title>
+    <style>
+        :root {
+            --bg-color: #ffffff;
+            --text-dark: #111827;
+            --text-gray: #6b7280;
+            --border-color: #e5e7eb;
+            --card-bg: #f9fafb;
+            --accent-black: #111827;
+            --accent-gray: #9ca3af;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-dark);
+            padding: 24px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Header Layout */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 16px;
+            margin-bottom: 24px;
+        }
+
+        .brand-title {
+            font-size: 28px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            color: var(--text-dark);
+            text-transform: lowercase;
+        }
+
+        .controls {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            background-color: var(--accent-black);
+            color: #ffffff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: opacity 0.2s;
+        }
+
+        .btn:hover {
+            opacity: 0.85;
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            color: var(--text-dark);
+            border: 1px solid var(--text-dark);
+        }
+
+        /* Dashboard Overview */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        .card {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px;
+            background-color: var(--card-bg);
+        }
+
+        .card-title {
+            font-size: 14px;
+            color: var(--text-gray);
+            font-weight: 600;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+        }
+
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            text-align: center;
+        }
+
+        .stat-box {
+            background-color: #ffffff;
+            padding: 12px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+        }
+
+        .stat-value {
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-gray);
+        }
+
+        /* Chart Simulation */
+        .chart-bar-container {
+            display: flex;
+            align-items: flex-end;
+            gap: 4px;
+            height: 80px;
+            padding-top: 10px;
+        }
+
+        .chart-bar {
+            flex: 1;
+            background-color: var(--accent-black);
+            border-radius: 2px 2px 0 0;
+            min-height: 4px;
+            transition: height 0.3s ease;
+        }
+
+        /* Main Tracker Table */
+        .tracker-section {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow-x: auto;
+            background-color: #ffffff;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        th, td {
+            border: 1px solid var(--border-color);
+            padding: 8px;
+            text-align: center;
+        }
+
+        th {
+            background-color: var(--card-bg);
+            color: var(--text-dark);
+            font-weight: 600;
+        }
+
+        td.habit-name {
+            text-align: left;
+            font-weight: 500;
+            min-width: 160px;
+            padding-left: 12px;
+        }
+
+        /* Checkbox styling */
+        input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+            accent-color: var(--accent-black);
+        }
+
+        /* Action Bar */
+        .action-bar {
+            margin-top: 16px;
+            display: flex;
+            justify-content: flex-end;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header>
+        <div class="brand-title">Habit Taken</div>
+        <div class="controls">
+            <button class="btn btn-outline" onclick="addHabit()">+ Add Habit</button>
+            <button class="btn" onclick="clearAllTicks()">Clear All Ticks</button>
+        </div>
+    </header>
+
+    <!-- Visual Dashboard Section -->
+    <div class="dashboard-grid">
+        <div class="card">
+            <div class="card-title">Daily Progress</div>
+            <div class="chart-bar-container" id="barChart">
+                <!-- Bars dynamically created via JS -->
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">Overall Stats</div>
+            <div class="stats-container">
+                <div class="stat-box">
+                    <div class="stat-value" id="statCompleted">0</div>
+                    <div class="stat-label">Done</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value" id="statTotal">0</div>
+                    <div class="stat-label">Total</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value" id="statRate">0%</div>
+                    <div class="stat-label">Rate</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Habit Matrix Table -->
+    <div class="tracker-section">
+        <table>
+            <thead>
+                <tr id="tableHeader">
+                    <th style="width: 200px;">My Habits</th>
+                    <!-- Days 1 to 14 headers built dynamically -->
+                </tr>
+            </thead>
+            <tbody id="habitTableBody">
+                <!-- Habit rows inserted via JS -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        // Sample Initial Habits
+        let habits = [
+            "Wake up at 05:00",
+            "Gym / Exercise",
+            "Reading / Learning",
+            "Day Planning",
+            "No Junk Food",
+            "Cold Shower",
+            "Meditation"
+        ];
+
+        const TOTAL_DAYS = 14; 
+        let habitState = {}; 
+
+        // Initialize App State
+        function initTracker() {
+            // Setup local state data
+            habits.forEach((habit, hIdx) => {
+                habitState[hIdx] = new Array(TOTAL_DAYS).fill(false);
+            });
+
+            renderTableHeader();
+            renderTableBody();
+            updateStats();
+        }
+
+        // Render Headers
+        function renderTableHeader() {
+            const headerTr = document.getElementById('tableHeader');
+            headerTr.innerHTML = '<th style="width: 200px; text-align: left; padding-left: 12px;">My Habits</th>';
+            for (let i = 1; i <= TOTAL_DAYS; i++) {
+                const th = document.createElement('th');
+                th.innerText = `D${i}`;
+                headerTr.appendChild(th);
+            }
+        }
+
+        // Render Table Rows
+        function renderTableBody() {
+            const tbody = document.getElementById('habitTableBody');
+            tbody.innerHTML = '';
+
+            habits.forEach((habit, hIdx) => {
+                const tr = document.createElement('tr');
+                
+                // Habit Label
+                const nameTd = document.createElement('td');
+                nameTd.className = 'habit-name';
+                nameTd.innerText = habit;
+                tr.appendChild(nameTd);
+
+                // Checkboxes for Days
+                for (let dIdx = 0; dIdx < TOTAL_DAYS; dIdx++) {
+                    const td = document.createElement('td');
+                    const checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    checkbox.checked = habitState[hIdx][dIdx] || false;
+                    checkbox.onchange = () => toggleCheck(hIdx, dIdx);
+                    td.appendChild(checkbox);
+                    tr.appendChild(td);
+                }
+
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Handle Checkbox Toggles
+        function toggleCheck(hIdx, dIdx) {
+            habitState[hIdx][dIdx] = !habitState[hIdx][dIdx];
+            updateStats();
+        }
+
+        // Action: Clear All Ticks
+        function clearAllTicks() {
+            Object.keys(habitState).forEach(hIdx => {
+                habitState[hIdx].fill(false);
+            });
+            renderTableBody();
+            updateStats();
+        }
+
+        // Action: Add New Habit
+        function addHabit() {
+            const habitName = prompt("Enter the name of the new habit:");
+            if (habitName && habitName.trim() !== "") {
+                const newIdx = habits.length;
+                habits.push(habitName.trim());
+                habitState[newIdx] = new Array(TOTAL_DAYS).fill(false);
+                renderTableBody();
+                updateStats();
+            }
+        }
+
+        // Calculate and Render Dashboard Analytics
+        function updateStats() {
+            let totalChecked = 0;
+            const totalPossible = habits.length * TOTAL_DAYS;
+            const dayTotals = new Array(TOTAL_DAYS).fill(0);
+
+            habits.forEach((_, hIdx) => {
+                for (let dIdx = 0; dIdx < TOTAL_DAYS; dIdx++) {
+                    if (habitState[hIdx][dIdx]) {
+                        totalChecked++;
+                        dayTotals[dIdx]++;
+                    }
+                }
+            });
+
+            // Update Numerical Metrics
+            document.getElementById('statCompleted').innerText = totalChecked;
+            document.getElementById('statTotal').innerText = totalPossible;
+            const rate = totalPossible > 0 ? Math.round((totalChecked / totalPossible) * 100) : 0;
+            document.getElementById('statRate').innerText = `${rate}%`;
+
+            // Update Progress Bar Heights
+            const barChart = document.getElementById('barChart');
+            barChart.innerHTML = '';
+            const maxHabits = habits.length || 1;
+
+            dayTotals.forEach(count => {
+                const bar = document.createElement('div');
+                bar.className = 'chart-bar';
+                const heightPercentage = (count / maxHabits) * 100;
+                bar.style.height = `${Math.max(heightPercentage, 5)}%`; 
+                barChart.appendChild(bar);
+            });
+        }
+
+        // Run on startup
+        initTracker();
+    </script>
+</body>
+</html>
