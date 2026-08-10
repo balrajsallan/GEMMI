@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>habitaken - Habit Tracker</title>
+    <style>
+        /* --- GLOBAL RESETS & VARS --- */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+
+        body {
+            background-color: #050505;
+            color: #e0e0e0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 650px;
+            background-color: #111111;
+            border: 1px solid #222222;
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8);
+        }
+
+        /* --- HEADER --- */
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .logo {
+            font-size: 2.5rem;
+            font-weight: 800;
+            letter-spacing: -1px;
+            background: linear-gradient(135deg, #00f2fe 0%, #4facfe 50%, #f093fb 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.2rem;
+        }
+
+        .subtitle {
+            color: #888888;
+            font-size: 0.95rem;
+        }
+
+        /* --- CONTROLS & FORM --- */
+        .add-habit-form {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            background-color: #1a1a1a;
+            border: 1px solid #333333;
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            color: #ffffff;
+            font-size: 0.95rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input[type="text"]:focus {
+            border-color: #00f2fe;
+        }
+
+        button {
+            cursor: pointer;
+            border: none;
+            border-radius: 8px;
+            padding: 0.75rem 1.25rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+        }
+
+        .btn-add {
+            background: linear-gradient(135deg, #00f2fe, #4facfe);
+            color: #000000;
+        }
+
+        .btn-add:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        .global-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #222222;
+        }
+
+        .stats {
+            color: #aaaaaa;
+            font-size: 0.85rem;
+        }
+
+        .stats span {
+            color: #00f2fe;
+            font-weight: bold;
+        }
+
+        .btn-restart {
+            background-color: #1f1414;
+            color: #ff5555;
+            border: 1px solid #441111;
+        }
+
+        .btn-restart:hover {
+            background-color: #ff5555;
+            color: #ffffff;
+        }
+
+        /* --- HABIT LIST --- */
+        .habit-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .habit-card {
+            background-color: #161616;
+            border: 1px solid #262626;
+            border-radius: 12px;
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: border-color 0.2s, transform 0.1s;
+        }
+
+        .habit-card:hover {
+            border-color: #333333;
+        }
+
+        .habit-card.completed {
+            border-color: #10331e;
+            background-color: #0d1611;
+        }
+
+        .habit-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex: 1;
+        }
+
+        /* Custom Colorful Checkbox */
+        .checkbox-custom {
+            width: 24px;
+            height: 24px;
+            border-radius: 6px;
+            border: 2px solid #444444;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            background-color: #1a1a1a;
+        }
+
+        .habit-card.completed .checkbox-custom {
+            background: linear-gradient(135deg, #11998e, #38ef7d);
+            border-color: transparent;
+        }
+
+        .checkbox-custom::after {
+            content: '✓';
+            color: #000;
+            font-weight: bold;
+            font-size: 14px;
+            display: none;
+        }
+
+        .habit-card.completed .checkbox-custom::after {
+            display: block;
+        }
+
+        .habit-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .habit-title {
+            font-weight: 500;
+            color: #ffffff;
+            font-size: 1rem;
+        }
+
+        .habit-card.completed .habit-title {
+            text-decoration: line-through;
+            color: #777777;
+        }
+
+        .habit-meta {
+            font-size: 0.75rem;
+            color: #777777;
+            margin-top: 0.2rem;
+        }
+
+        .habit-actions {
+            display: flex;
+            gap: 0.4rem;
+        }
+
+        .btn-icon {
+            background-color: #222222;
+            color: #aaaaaa;
+            padding: 0.4rem 0.6rem;
+            font-size: 0.75rem;
+            border-radius: 6px;
+        }
+
+        .btn-icon:hover {
+            background-color: #333333;
+            color: #ffffff;
+        }
+
+        .btn-clone {
+            color: #f093fb;
+            border: 1px solid rgba(240, 147, 251, 0.2);
+        }
+
+        .btn-clone:hover {
+            background-color: rgba(240, 147, 251, 0.15);
+        }
+
+        .btn-delete:hover {
+            background-color: #3a1515;
+            color: #ff5555;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 2rem;
+            color: #555555;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <div class="logo">habitaken</div>
+            <div class="subtitle">Track, clone, and master your daily routine</div>
+        </header>
+
+        <!-- New Habit Creator -->
+        <form class="add-habit-form" id="habitForm">
+            <input type="text" id="habitInput" placeholder="Create a new habit..." required>
+            <button type="submit" class="btn-add">+ Create</button>
+        </form>
+
+        <!-- Stats & Global Restart -->
+        <div class="global-actions">
+            <div class="stats" id="statsDisplay">
+                Progress: <span>0/0</span> completed
+            </div>
+            <button class="btn-restart" id="restartBtn">🔄 Restart All Ticks</button>
+        </div>
+
+        <!-- Dynamic Habits List -->
+        <div class="habit-list" id="habitList"></div>
+    </div>
+
+    <script>
+        // --- APP STATE & INITIALIZATION ---
+        let habits = JSON.parse(localStorage.getItem('habitaken_data')) || [
+            { id: 1, title: "Morning Hydration (1L)", completed: false, streak: 0 },
+            { id: 2, title: "30-Minute Workout", completed: true, streak: 1 }
+        ];
+
+        const habitForm = document.getElementById('habitForm');
+        const habitInput = document.getElementById('habitInput');
+        const habitList = document.getElementById('habitList');
+        const restartBtn = document.getElementById('restartBtn');
+        const statsDisplay = document.getElementById('statsDisplay');
+
+        // --- RENDER FUNCTION ---
+        function renderHabits() {
+            habitList.innerHTML = '';
+
+            if (habits.length === 0) {
+                habitList.innerHTML = '<div class="empty-state">No habits added yet. Type a habit above to get started!</div>';
+                updateStats();
+                return;
+            }
+
+            habits.forEach((habit) => {
+                const card = document.createElement('div');
+                card.className = `habit-card ${habit.completed ? 'completed' : ''}`;
+                
+                card.innerHTML = `
+                    <div class="habit-left">
+                        <div class="checkbox-custom" onclick="toggleHabit(${habit.id})"></div>
+                        <div class="habit-info">
+                            <span class="habit-title">${escapeHtml(habit.title)}</span>
+                            <span class="habit-meta">Streak: ${habit.streak} days</span>
+                        </div>
+                    </div>
+                    <div class="habit-actions">
+                        <button class="btn-icon btn-clone" onclick="cloneHabit(${habit.id})" title="Clone habit">📋 Clone</button>
+                        <button class="btn-icon btn-delete" onclick="deleteHabit(${habit.id})" title="Delete habit">✕</button>
+                    </div>
+                `;
+                habitList.appendChild(card);
+            });
+
+            updateStats();
+            saveData();
+        }
+
+        // --- HELPER & CORE FUNCTIONS ---
+        function saveData() {
+            localStorage.setItem('habitaken_data', JSON.stringify(habits));
+        }
+
+        function updateStats() {
+            const completedCount = habits.filter(h => h.completed).length;
+            statsDisplay.innerHTML = `Progress: <span>${completedCount}/${habits.length}</span> completed`;
+        }
+
+        function escapeHtml(str) {
+            return str.replace(/[&<>"']/g, (m) => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'
+            })[m]);
+        }
+
+        // --- ACTIONS ---
+        
+        // Create new habit
+        habitForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const title = habitInput.value.trim();
+            if (!title) return;
+
+            const newHabit = {
+                id: Date.now(),
+                title: title,
+                completed: false,
+                streak: 0
+            };
+
+            habits.push(newHabit);
+            habitInput.value = '';
+            renderHabits();
+        });
+
+        // Toggle habit completed tick
+        window.toggleHabit = function(id) {
+            habits = habits.map(h => {
+                if (h.id === id) {
+                    const isNowCompleted = !h.completed;
+                    return {
+                        ...h,
+                        completed: isNowCompleted,
+                        streak: isNowCompleted ? h.streak + 1 : Math.max(0, h.streak - 1)
+                    };
+                }
+                return h;
+            });
+            renderHabits();
+        };
+
+        // Clone existing habit
+        window.cloneHabit = function(id) {
+            const habitToClone = habits.find(h => h.id === id);
+            if (!habitToClone) return;
+
+            const clonedHabit = {
+                id: Date.now(),
+                title: `${habitToClone.title} (Copy)`,
+                completed: false,
+                streak: 0
+            };
+
+            habits.push(clonedHabit);
+            renderHabits();
+        };
+
+        // Delete habit
+        window.deleteHabit = function(id) {
+            habits = habits.filter(h => h.id !== id);
+            renderHabits();
+        };
+
+        // Restart all ticks (Reset status for a new day)
+        restartBtn.addEventListener('click', () => {
+            if (habits.length === 0) return;
+            
+            if (confirm("Restart all ticks? This will uncheck every habit for today.")) {
+                habits = habits.map(h => ({ ...h, completed: false }));
+                renderHabits();
+            }
+        });
+
+        // Initial Load
+        renderHabits();
+    </script>
+</body>
+</html>
