@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AETHERIA | Orbital Mobility</title>
+  <!-- Three.js for 3D Rocket Rendering -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+  <style>
+    :root {
+      --bg-color: #080a0f;
+      --accent-white: #ffffff;
+      --text-dim: #a0a5b5;
+      --glass-bg: rgba(255, 255, 255, 0.04);
+      --glass-border: rgba(255, 255, 255, 0.15);
+      --font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body, html {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: var(--bg-color);
+      color: var(--accent-white);
+      font-family: var(--font-family);
+    }
+
+    /* Canvas Container */
+    #canvas-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+    }
+
+    /* UI Overlay */
+    .ui-wrapper {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 2rem 4rem;
+      pointer-events: none;
+    }
+
+    .ui-wrapper * {
+      pointer-events: auto;
+    }
+
+    /* Header & Nav */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      font-size: 1.5rem;
+      font-weight: 800;
+      letter-spacing: 3px;
+    }
+
+    .logo span {
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      margin-left: 5px;
+    }
+
+    nav {
+      display: flex;
+      gap: 1.5rem;
+      background: var(--glass-bg);
+      padding: 0.6rem 1.2rem;
+      border-radius: 30px;
+      border: 1px solid var(--glass-border);
+      backdrop-filter: blur(10px);
+    }
+
+    nav a {
+      color: var(--text-dim);
+      text-decoration: none;
+      font-size: 0.85rem;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      transition: all 0.3s ease;
+    }
+
+    nav a.active, nav a:hover {
+      color: var(--accent-white);
+      text-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
+    }
+
+    /* Page Sections */
+    .page-section {
+      display: none;
+      max-width: 550px;
+      animation: fadeIn 0.5s ease forwards;
+    }
+
+    .page-section.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(15px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Typography & Hero */
+    .tagline {
+      font-size: 0.8rem;
+      letter-spacing: 2px;
+      color: var(--text-dim);
+      margin-bottom: 0.5rem;
+    }
+
+    h1 {
+      font-size: 4rem;
+      font-weight: 900;
+      letter-spacing: 4px;
+      line-height: 1;
+      margin-bottom: 1rem;
+    }
+
+    .description {
+      color: var(--text-dim);
+      line-height: 1.6;
+      margin-bottom: 2rem;
+    }
+
+    /* Glassmorphism Cards */
+    .glass-card {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      backdrop-filter: blur(16px);
+      padding: 2.5rem;
+      border-radius: 16px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+    }
+
+    .glass-card h2 {
+      font-size: 1.8rem;
+      margin-bottom: 1rem;
+      letter-spacing: 1px;
+    }
+
+    /* Buttons */
+    .cta-group {
+      display: flex;
+      gap: 1rem;
+    }
+
+    .btn {
+      padding: 0.8rem 1.8rem;
+      border-radius: 30px;
+      font-size: 0.85rem;
+      letter-spacing: 1px;
+      cursor: pointer;
+      border: none;
+      transition: all 0.3s ease;
+    }
+
+    .btn-primary {
+      background: var(--accent-white);
+      color: #000;
+      font-weight: 700;
+    }
+
+    .btn-primary:hover {
+      box-shadow: 0 0 15px rgba(255, 255, 255, 0.6);
+      transform: translateY(-2px);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--accent-white);
+      border: 1px solid var(--glass-border);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    /* Stats Grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+
+    .stat-box h3 {
+      font-size: 1.5rem;
+    }
+
+    .stat-box p {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+    }
+
+    /* Table */
+    .specs-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .specs-table td {
+      padding: 0.8rem 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      font-size: 0.9rem;
+    }
+
+    .specs-table td:first-child {
+      color: var(--text-dim);
+    }
+
+    /* Missions & Tech Lists */
+    .mission-item {
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .badge {
+      font-size: 0.65rem;
+      background: #ffffff;
+      color: #000;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-weight: 800;
+    }
+
+    .badge.upcoming {
+      background: transparent;
+      color: #fff;
+      border: 1px solid #fff;
+    }
+
+    .tech-list {
+      list-style: none;
+      margin-top: 1rem;
+    }
+
+    .tech-list li {
+      margin-bottom: 0.8rem;
+      font-size: 0.9rem;
+      color: var(--text-dim);
+    }
+
+    /* Contact Form */
+    .contact-form {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .contact-form input, .contact-form textarea {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--glass-border);
+      border-radius: 8px;
+      padding: 0.8rem;
+      color: #fff;
+      outline: none;
+    }
+
+    /* Footer */
+    footer {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      letter-spacing: 1px;
+    }
+
+    .status-indicator {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      background-color: #00ff88;
+      border-radius: 50%;
+      box-shadow: 0 0 8px #00ff88;
+    }
+
+    @media (max-width: 768px) {
+      .ui-wrapper { padding: 1.5rem; }
+      header { flex-direction: column; gap: 1rem; }
+      h1 { font-size: 2.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Background Canvas for 3D Rocket -->
+  <div id="canvas-container"></div>
+
+  <!-- Main UI Overlay -->
+  <div class="ui-wrapper">
+    <!-- Header Navigation -->
+    <header>
+      <div class="logo">AETHERIA<span>//01</span></div>
+      <nav>
+        <a href="#home" class="nav-btn active" data-page="home">Home</a>
+        <a href="#about" class="nav-btn" data-page="about">About</a>
+        <a href="#specs" class="nav-btn" data-page="specs">Specs</a>
+        <a href="#missions" class="nav-btn" data-page="missions">Missions</a>
+        <a href="#tech" class="nav-btn" data-page="tech">Technology</a>
+        <a href="#contact" class="nav-btn" data-page="contact">Contact</a>
+      </nav>
+    </header>
+
+    <!-- Page 1: Home -->
+    <section id="home" class="page-section active">
+      <div class="hero-content">
+        <p class="tagline">NEXT-GEN ORBITAL VEHICLE</p>
+        <h1>AETHER-X1</h1>
+        <p class="description">
+          The world's first fully reusable, autonomous deep-space vessel crafted from high-purity white ceramic titanium.
+        </p>
+        <div class="cta-group">
+          <button class="btn btn-primary" onclick="navigateTo('specs')">Explore Specs</button>
+          <button class="btn btn-secondary" onclick="navigateTo('missions')">View Missions</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Page 2: About -->
+    <section id="about" class="page-section">
+      <div class="glass-card">
+        <h2>About Aetheria</h2>
+        <p>Aetheria was founded to redefine inter-planetary transit. Combining minimalist design philosophy with extreme zero-emission propulsion, the AETHER-X1 marks a new epoch in space flight.</p>
+        <div class="stats-grid">
+          <div class="stat-box">
+            <h3>100%</h3>
+            <p>Reusable Material</p>
+          </div>
+          <div class="stat-box">
+            <h3>0.08ms</h3>
+            <p>Quantum Latency</p>
+          </div>
+          <div class="stat-box">
+            <h3>Mach 25</h3>
+            <p>Orbital Speed</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Page 3: Specs -->
+    <section id="specs" class="page-section">
+      <div class="glass-card">
+        <h2>Technical Specifications</h2>
+        <table class="specs-table">
+          <tr>
+            <td>Height</td>
+            <td>72.5 Meters</td>
+          </tr>
+          <tr>
+            <td>Hull Composition</td>
+            <td>Pure White Titanium Ceramic Matrix</td>
+          </tr>
+          <tr>
+            <td>Propulsion</td>
+            <td>Plasma-Ion Thruster Core</td>
+          </tr>
+          <tr>
+            <td>Payload Capacity</td>
+            <td>150 Metric Tons</td>
+          </tr>
+          <tr>
+            <td>Autopilot System</td>
+            <td>Neural-Link v4 Autonomous AI</td>
+          </tr>
+        </table>
+      </div>
+    </section>
+
+    <!-- Page 4: Missions -->
+    <section id="missions" class="page-section">
+      <div class="glass-card">
+        <h2>Active Missions</h2>
+        <div class="mission-list">
+          <div class="mission-item">
+            <span class="badge">ACTIVE</span>
+            <h3>Artemis Gateway Orbit</h3>
+            <p>Deploying deep-space communication nodes to lunar orbit.</p>
+          </div>
+          <div class="mission-item">
+            <span class="badge upcoming">PLANNED</span>
+            <h3>Ares-I Cargo Transfer</h3>
+            <p>First autonomous white-hull resupply module to Martian outpost.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Page 5: Technology -->
+    <section id="tech" class="page-section">
+      <div class="glass-card">
+        <h2>Propulsion & Tech</h2>
+        <p>Featuring zero-carbon ion ionization engines encased in high-reflectivity thermal armor. The brilliant white finish acts as a passive solar radiation shield, reducing thermal absorption by 98.4%.</p>
+        <ul class="tech-list">
+          <li><strong>Thermal Shielding:</strong> Monolithic White Oxide Alloy</li>
+          <li><strong>Energy Source:</strong> Micro-Fusion Battery Matrix</li>
+          <li><strong>Navigation:</strong> Quantum Entanglement Positioning</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Page 6: Contact -->
+    <section id="contact" class="page-section">
+      <div class="glass-card">
+        <h2>Initiate Contact</h2>
+        <form class="contact-form" onsubmit="event.preventDefault(); alert('Message Transmitted.');">
+          <input type="text" placeholder="Callsign / Name" required />
+          <input type="email" placeholder="Frequency / Email" required />
+          <textarea rows="4" placeholder="Encrypted Transmission" required></textarea>
+          <button type="submit" class="btn btn-primary">Send Signal</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- Footer Controls -->
+    <footer>
+      <div class="control-hint">MOVE MOUSE TO ROTATE ROCKET</div>
+      <div class="status-indicator"><span class="dot"></span> SYSTEMS NOMINAL</div>
+    </footer>
+  </div>
+
+  <script>
+    // --- 1. Navigation SPA Logic ---
+    function navigateTo(pageId) {
+      document.querySelectorAll('.page-section').forEach(section => {
+        section.classList.remove('active');
+      });
+      document.querySelectorAll('nav a').forEach(link => {
+        link.classList.remove('active');
+      });
+
+      const targetPage = document.getElementById(pageId);
+      const targetLink = document.querySelector(`nav a[data-page="${pageId}"]`);
+
+      if (targetPage) targetPage.classList.add('active');
+      if (targetLink) targetLink.classList.add('active');
+    }
+
+    document.querySelectorAll('nav a').forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const pageId = link.getAttribute('data-page');
+        navigateTo(pageId);
+      });
+    });
+
+    // --- 2. Three.js Procedural 3D Cool White Rocket ---
+    const container = document.getElementById('canvas-container');
+
+    // Scene, Camera, Renderer
+    const scene = new THREE.Scene();
+    scene.fog = new THREE.FogExp2(0x080a0f, 0.015);
+
+    const camera = new THREE.PerspectiveCamera(
+      45,
+      window.innerWidth / window.innerHeight,
+      0.1,
+      1000
+    );
+    camera.position.set(5, 2, 12);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    container.appendChild(renderer.domElement);
+
+    // --- 3. Build Rocket Components ---
+    const rocketGroup = new THREE.Group();
+
+    // Materials
+    const whiteFuturisticMaterial = new THREE.MeshStandardMaterial({
+      color: 0xf0f4f8,
+      metalness: 0.85,
+      roughness: 0.15,
+      wireframe: false
+    });
+
+    const darkAccentMaterial = new THREE.MeshStandardMaterial({
+      color: 0x111318,
+      metalness: 0.9,
+      roughness: 0.2
+    });
+
+    const glowingThrusterMaterial = new THREE.MeshBasicMaterial({
+      color: 0xffffff
+    });
+
+    // Rocket Body (Cylinder)
+    const bodyGeo = new THREE.CylinderGeometry(0.8, 1, 6, 32);
+    const body = new THREE.Mesh(bodyGeo, whiteFuturisticMaterial);
+    body.position.y = 0;
+    rocketGroup.add(body);
+
+    // Rocket Cone/Nose (Cone)
+    const noseGeo = new THREE.ConeGeometry(0.8, 2.2, 32);
+    const nose = new THREE.Mesh(noseGeo, whiteFuturisticMaterial);
+    nose.position.y = 4.1;
+    rocketGroup.add(nose);
+
+    // Dark Glass Cockpit Band
+    const cockpitGeo = new THREE.CylinderGeometry(0.81, 0.81, 0.6, 32);
+    const cockpit = new THREE.Mesh(cockpitGeo, darkAccentMaterial);
+    cockpit.position.y = 2.2;
+    rocketGroup.add(cockpit);
+
+    // Rocket Fins (4 Wings)
+    const finShape = new THREE.Shape();
+    finShape.moveTo(0, 0);
+    finShape.lineTo(1.2, -1.5);
+    finShape.lineTo(1.2, -2.5);
+    finShape.lineTo(0, -2.0);
+    finShape.closePath();
+
+    const extrudeSettings = { depth: 0.08, bevelEnabled: true, bevelThickness: 0.02 };
+    const finGeo = new THREE.ExtrudeGeometry(finShape, extrudeSettings);
+
+    for (let i = 0; i < 4; i++) {
+      const fin = new THREE.Mesh(finGeo, whiteFuturisticMaterial);
+      const angle = (i * Math.PI) / 2;
+      fin.position.y = -1;
+      fin.rotation.y = angle;
+      fin.translateOnAxis(new THREE.Vector3(1, 0, 0), 0.75);
+      rocketGroup.add(fin);
+    }
+
+    // Thruster Engine Nozzle
+    const engineGeo = new THREE.CylinderGeometry(0.6, 0.8, 0.8, 32);
+    const engine = new THREE.Mesh(engineGeo, darkAccentMaterial);
+    engine.position.y = -3.4;
+    rocketGroup.add(engine);
+
+    // Thruster Light Core
+    const glowGeo = new THREE.CylinderGeometry(0.5, 0.1, 1.2, 32);
+    const glow = new THREE.Mesh(glowGeo, glowingThrusterMaterial);
+    glow.position.y = -4.2;
+    rocketGroup.add(glow);
+
+    scene.add(rocketGroup);
+
+    // --- 4. Starfield Background ---
+    const starsGeo = new THREE.BufferGeometry();
+    const starsCount = 1200;
+    const posArray = new Float32Array(starsCount * 3);
+
+    for (let i = 0; i < starsCount * 3; i++) {
+      posArray[i] = (Math.random() - 0.5) * 80;
+    }
+
+    starsGeo.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+    const starsMat = new THREE.PointsMaterial({
+      size: 0.05,
+      color: 0xffffff,
+      transparent: true,
+      opacity: 0.8
+    });
+    const starMesh = new THREE.Points(starsGeo, starsMat);
+    scene.add(starMesh);
+
+    // --- 5. Lighting ---
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
+    scene.add(ambientLight);
+
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 1.8);
+    directionalLight.position.set(10, 20, 10);
+    scene.add(directionalLight);
+
+    const bluePointLight = new THREE.PointLight(0xffffff, 2, 10);
+    bluePointLight.position.set(-5, -2, -5);
+    scene.add(bluePointLight);
+
+    // --- 6. Interactive Mouse Control ---
+    let mouseX = 0;
+    let mouseY = 0;
+    let targetX = 0;
+    let targetY = 0;
+
+    document.addEventListener('mousemove', (event) => {
+      mouseX = (event.clientX - window.innerWidth / 2) * 0.001;
+      mouseY = (event.clientY - window.innerHeight / 2) * 0.001;
+    });
+
+    // --- 7. Animation Loop ---
+    function animate() {
+      requestAnimationFrame(animate);
+
+      targetX += (mouseX - targetX) * 0.05;
+      targetY += (mouseY - targetY) * 0.05;
+
+      rocketGroup.rotation.y += 0.005;
+      rocketGroup.rotation.x = targetY;
+      rocketGroup.rotation.z = -targetX;
+
+      // Subtle floating motion
+      rocketGroup.position.y = Math.sin(Date.now() * 0.002) * 0.2;
+
+      // Rotate starfield slowly
+      starMesh.rotation.y -= 0.0005;
+
+      renderer.render(scene, camera);
+    }
+
+    animate();
+
+    // --- 8. Window Resize Handling ---
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+  </script>
+</body>
+</html>
