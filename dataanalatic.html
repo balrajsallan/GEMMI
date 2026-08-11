@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AETHER // Quantum Data Processor</title>
+  <style>
+    /* --- CSS VARIABLES & CORE STYLES --- */
+    :root {
+      --bg-dark: #060913;
+      --bg-card: rgba(10, 20, 40, 0.65);
+      --border-glow: rgba(0, 243, 255, 0.3);
+      --primary-cyan: #00f3ff;
+      --primary-blue: #0066ff;
+      --text-main: #e2f1ff;
+      --text-dim: #6c8cae;
+      --font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-family: var(--font-family);
+      min-height: 100vh;
+      display: flex;
+      overflow-x: hidden;
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(0, 102, 255, 0.15) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(0, 243, 255, 0.1) 0%, transparent 40%);
+    }
+
+    /* Background Grid FX */
+    body::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: linear-gradient(rgba(0, 243, 255, 0.03) 1px, transparent 1px),
+                  linear-gradient(90deg, rgba(0, 243, 255, 0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    /* --- SIDEBAR --- */
+    aside {
+      width: 240px;
+      background: rgba(5, 12, 26, 0.8);
+      border-right: 1px solid var(--border-glow);
+      backdrop-filter: blur(12px);
+      display: flex;
+      flex-direction: column;
+      padding: 1.5rem;
+    }
+
+    .brand {
+      font-size: 1.2rem;
+      font-weight: 800;
+      letter-spacing: 3px;
+      color: var(--primary-cyan);
+      margin-bottom: 2.5rem;
+      text-shadow: 0 0 10px rgba(0, 243, 255, 0.5);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-dot {
+      width: 10px;
+      height: 10px;
+      background: var(--primary-cyan);
+      box-shadow: 0 0 8px var(--primary-cyan);
+      border-radius: 50%;
+    }
+
+    nav {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .nav-item {
+      padding: 0.8rem 1rem;
+      color: var(--text-dim);
+      text-decoration: none;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      letter-spacing: 1px;
+      transition: all 0.3s ease;
+      border: 1px solid transparent;
+    }
+
+    .nav-item:hover, .nav-item.active {
+      color: var(--primary-cyan);
+      background: rgba(0, 243, 255, 0.08);
+      border-color: var(--border-glow);
+      box-shadow: inset 0 0 10px rgba(0, 243, 255, 0.1);
+    }
+
+    /* --- MAIN LAYOUT --- */
+    main {
+      flex: 1;
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      overflow-y: auto;
+    }
+
+    /* Header */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border-glow);
+    }
+
+    .status-badge {
+      font-size: 0.75rem;
+      letter-spacing: 2px;
+      padding: 0.3rem 0.8rem;
+      border-radius: 20px;
+      background: rgba(0, 243, 255, 0.1);
+      border: 1px solid var(--primary-cyan);
+      color: var(--primary-cyan);
+      box-shadow: 0 0 8px rgba(0, 243, 255, 0.3);
+    }
+
+    /* Grid Layout for Modules */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+    }
+
+    .full-width {
+      grid-column: span 2;
+    }
+
+    /* --- GLASS CARDS --- */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-glow);
+      border-radius: 12px;
+      padding: 1.5rem;
+      backdrop-filter: blur(16px);
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 2px;
+      background: linear-gradient(90deg, transparent, var(--primary-cyan), transparent);
+    }
+
+    .card-title {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--text-dim);
+      margin-bottom: 1rem;
+    }
+
+    /* --- INPUT & CALCULATOR SECTION --- */
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+    }
+
+    label {
+      font-size: 0.8rem;
+      color: var(--text-dim);
+    }
+
+    input[type="text"] {
+      background: rgba(2, 6, 16, 0.8);
+      border: 1px solid var(--border-glow);
+      padding: 0.8rem 1rem;
+      border-radius: 6px;
+      color: var(--primary-cyan);
+      font-family: monospace;
+      font-size: 1rem;
+      outline: none;
+      transition: all 0.3s ease;
+    }
+
+    input[type="text"]:focus {
+      border-color: var(--primary-cyan);
+      box-shadow: 0 0 12px rgba(0, 243, 255, 0.4);
+    }
+
+    .btn-calc {
+      background: linear-gradient(135deg, var(--primary-blue), var(--primary-cyan));
+      border: none;
+      color: #000;
+      font-weight: 700;
+      padding: 0.8rem 1.5rem;
+      border-radius: 6px;
+      cursor: pointer;
+      letter-spacing: 1.5px;
+      transition: all 0.3s ease;
+      margin-top: 0.5rem;
+    }
+
+    .btn-calc:hover {
+      box-shadow: 0 0 20px rgba(0, 243, 255, 0.6);
+      transform: translateY(-1px);
+    }
+
+    /* --- METRICS DISPLAY --- */
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+    }
+
+    .metric-box {
+      background: rgba(0, 243, 255, 0.03);
+      border: 1px solid rgba(0, 243, 255, 0.15);
+      padding: 1rem;
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    .metric-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--primary-cyan);
+      font-family: monospace;
+      margin-top: 0.3rem;
+      text-shadow: 0 0 8px rgba(0, 243, 255, 0.3);
+    }
+
+    /* --- VISUALIZER --- */
+    .bar-chart {
+      display: flex;
+      align-items: flex-end;
+      gap: 10px;
+      height: 160px;
+      padding-top: 1rem;
+    }
+
+    .bar-wrapper {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+      height: 100%;
+      justify-content: flex-end;
+    }
+
+    .bar {
+      width: 100%;
+      background: linear-gradient(180deg, var(--primary-cyan), var(--primary-blue));
+      border-radius: 4px 4px 0 0;
+      transition: height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 0 10px rgba(0, 243, 255, 0.2);
+    }
+
+    .bar-val {
+      font-size: 0.7rem;
+      font-family: monospace;
+      color: var(--text-dim);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- SIDEBAR NAVIGATION -->
+  <aside>
+    <div class="brand">
+      <div class="brand-dot"></div>
+      AETHER v4.0
+    </div>
+    <nav>
+      <a href="#" class="nav-item active">Analytics Core</a>
+      <a href="#" class="nav-item">Neural Models</a>
+      <a href="#" class="nav-item">Data Streams</a>
+      <a href="#" class="nav-item">Quantum Logs</a>
+      <a href="#" class="nav-item">System Config</a>
+    </nav>
+  </aside>
+
+  <!-- MAIN CONTENT AREA -->
+  <main>
+    <header>
+      <div>
+        <h2>DATA ANALYSIS ENGINE</h2>
+        <p style="color: var(--text-dim); font-size: 0.85rem;">REAL-TIME STATISTICAL COMPUTATION MATRIX</p>
+      </div>
+      <div class="status-badge">SYSTEM ONLINE</div>
+    </header>
+
+    <div class="dashboard-grid">
+      
+      <!-- DATA INPUT SECTION -->
+      <div class="card">
+        <div class="card-title">// Data Array Input</div>
+        <div class="input-group">
+          <label for="dataInput">Enter comma-separated numerical values:</label>
+          <input type="text" id="dataInput" value="45, 82, 19, 94, 63, 27, 75, 51" placeholder="e.g. 12, 45, 67">
+          <button class="btn-calc" onclick="processData()">EXECUTE COMPUTATION</button>
+        </div>
+      </div>
+
+      <!-- METRICS METRIC READOUT -->
+      <div class="card">
+        <div class="card-title">// Real-time Statistical Metrics</div>
+        <div class="metrics-grid">
+          <div class="metric-box">
+            <div class="card-title" style="margin:0; font-size: 0.7rem;">MEAN</div>
+            <div class="metric-value" id="meanVal">0.0</div>
+          </div>
+          <div class="metric-box">
+            <div class="card-title" style="margin:0; font-size: 0.7rem;">MEDIAN</div>
+            <div class="metric-value" id="medianVal">0.0</div>
+          </div>
+          <div class="metric-box">
+            <div class="card-title" style="margin:0; font-size: 0.7rem;">MAX</div>
+            <div class="metric-value" id="maxVal">0.0</div>
+          </div>
+          <div class="metric-box">
+            <div class="card-title" style="margin:0; font-size: 0.7rem;">MIN</div>
+            <div class="metric-value" id="minVal">0.0</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- GRAPHICAL VISUALIZER -->
+      <div class="card full-width">
+        <div class="card-title">// Spatial Visualizer Matrix</div>
+        <div class="bar-chart" id="chartContainer">
+          <!-- Dynamic bars will be rendered here via JavaScript -->
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- JAVASCRIPT LOGIC -->
+  <script>
+    function processData() {
+      const rawInput = document.getElementById('dataInput').value;
+      // Parse numerical array
+      const numbers = rawInput
+        .split(',')
+        .map(n => parseFloat(n.trim()))
+        .filter(n => !isNaN(n));
+
+      if (numbers.length === 0) {
+        alert("Please enter a valid series of numbers.");
+        return;
+      }
+
+      // Calculations
+      const sum = numbers.reduce((acc, val) => acc + val, 0);
+      const mean = (sum / numbers.length).toFixed(1);
+      
+      const sorted = [...numbers].sort((a, b) => a - b);
+      const min = sorted[0];
+      const max = sorted[sorted.length - 1];
+      
+      let median;
+      const mid = Math.floor(sorted.length / 2);
+      if (sorted.length % 2 === 0) {
+        median = ((sorted[mid - 1] + sorted[mid]) / 2).toFixed(1);
+      } else {
+        median = sorted[mid].toFixed(1);
+      }
+
+      // Update UI Metrics
+      document.getElementById('meanVal').innerText = mean;
+      document.getElementById('medianVal').innerText = median;
+      document.getElementById('maxVal').innerText = max;
+      document.getElementById('minVal').innerText = min;
+
+      // Render Visualizer Bars
+      renderChart(numbers, max);
+    }
+
+    function renderChart(numbers, max) {
+      const container = document.getElementById('chartContainer');
+      container.innerHTML = ''; // Clear existing bars
+
+      // Scale bars relative to maximum value
+      const safeMax = max === 0 ? 1 : max;
+
+      numbers.forEach((num) => {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'bar-wrapper';
+
+        const bar = document.createElement('div');
+        bar.className = 'bar';
+        
+        // Calculate height percentage relative to max value
+        const heightPercent = Math.max((num / safeMax) * 100, 4); 
+        
+        // Set initial 0 height for transition effect
+        bar.style.height = '0%';
+
+        const label = document.createElement('div');
+        label.className = 'bar-val';
+        label.innerText = num;
+
+        wrapper.appendChild(bar);
+        wrapper.appendChild(label);
+        container.appendChild(wrapper);
+
+        // Trigger animation
+        setTimeout(() => {
+          bar.style.height = `${heightPercent}%`;
+        }, 50);
+      });
+    }
+
+    // Initial computation on load
+    window.onload = processData;
+  </script>
+</body>
+</html>
